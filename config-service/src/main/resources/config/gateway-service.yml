@@ -1,0 +1,45 @@
+server:
+  port: 8060
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8061/eureka/
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-},%X{spanId:-}] ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: demo-a-service
+          uri: lb://demo-a-service
+          predicates:
+            - Path=/demo-a/**
+          filters:
+            - RewritePath=/demo-a/(?<path>.*), /$\{path}
+        - id: demo-b-service
+          uri: lb://demo-b-service
+          predicates:
+            - Path=/demo-b/**
+          filters:
+            - RewritePath=/demo-b/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: demo-a
+        url: /v3/api-docs/demo-a
+      - name: demo-b
+        url: /v3/api-docs/demo-b
