@@ -43,3 +43,8 @@ springdoc:
         url: /v3/api-docs/demo-a
       - name: demo-b
         url: /v3/api-docs/demo-b
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
